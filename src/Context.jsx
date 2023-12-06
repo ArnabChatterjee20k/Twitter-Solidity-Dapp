@@ -370,7 +370,10 @@ export default function ContextProvider({ children }) {
       return new ethers.BrowserProvider(window.ethereum);
   });
   const [signer, setSigner] = useState(null);
-
+  const signerAddress = signer?.address
+  const contract = signer
+    ? new ethers.Contract(walletAddress, walletABI, signer)
+    : null;
   /**
    * when metamask is present in the browser or other wallet
    * we can detect using window.ethereum
@@ -422,8 +425,16 @@ export default function ContextProvider({ children }) {
     }
     setProvider(new ethers.BrowserProvider(window.ethereum));
   }
+
+  async function getAccount() {
+    // const accounts = await provider.listAccounts()
+    // return accounts[0].address
+    return signer.address;
+  }
   return (
-    <Context.Provider value={{ signer, provider, connectToMetaMask }}>
+    <Context.Provider
+      value={{ signer, provider, contract, connectToMetaMask, signerAddress }}
+    >
       {children}
     </Context.Provider>
   );
